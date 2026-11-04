@@ -8,7 +8,7 @@ import streamlit as st
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Escale Atlantique — Avis clients", page_icon="🏨")
-st.title("🏨 Sentiment des avis clients")
+st.title("🏨 Sentiment des avis clients.")
 st.caption("Escale Atlantique · outil du service qualité")
 
 text = st.text_area(
