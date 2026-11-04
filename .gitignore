@@ -1,0 +1,12 @@
+# Variables d'environnement locales (copie de .env.example)
+.env
+
+# Cache du modèle Hugging Face et logs de l'API (volumes docker compose)
+models/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
