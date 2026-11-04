@@ -23,7 +23,7 @@ services:                      # un bloc par conteneur
     build: ./api               # construire l'image à partir de ./api/Dockerfile
     env_file: .env             # variables d'environnement lues dans .env
     ports:
-      - "8000:8000"            # hôte:conteneur, comme docker run -p
+      - "8008:8008"            # hôte:conteneur, comme docker run -p
     volumes:
       - ./logs:/app/logs       # dossier de l'hôte monté dans le conteneur
     networks:
@@ -45,24 +45,24 @@ networks:
 
 ## 3. Le réseau : on s'appelle par son nom
 
-Sur un réseau compose, **chaque service est joignable par son nom**. Depuis le conteneur `ui`, l'API se trouve à `http://api:8000`.
+Sur un réseau compose, **chaque service est joignable par son nom**. Depuis le conteneur `ui`, l'API se trouve à `http://api:8008`.
 
-Pourquoi pas `localhost` ? Dans un conteneur, `localhost` désigne **le conteneur lui-même**. Depuis `ui`, `http://localhost:8000` cherche une API… dans le conteneur Streamlit, où il n'y en a pas.
+Pourquoi pas `localhost` ? Dans un conteneur, `localhost` désigne **le conteneur lui-même**. Depuis `ui`, `http://localhost:8008` cherche une API… dans le conteneur Streamlit, où il n'y en a pas.
 
 ```
 Ta machine (navigateur)
-   │ localhost:8501                 │ localhost:8000 (Swagger, curl)
+   │ localhost:8501                 │ localhost:8008 (Swagger, curl)
    ▼                                ▼
 ┌──────── réseau compose ─────────────────────────┐
-│  ui  ──── http://api:8000 ────▶  api            │
+│  ui  ──── http://api:8008 ────▶  api            │
 │  (localhost = ui)                (localhost = api)
 └─────────────────────────────────────────────────┘
 ```
 
 | Qui appelle l'API ? | Adresse à utiliser |
 |---|---|
-| Ton navigateur, curl, Postman (sur ta machine) | `http://localhost:8000` |
-| Un autre conteneur de la même stack | `http://api:8000` |
+| Ton navigateur, curl, Postman (sur ta machine) | `http://localhost:8008` |
+| Un autre conteneur de la même stack | `http://api:8008` |
 
 C'est pour cela que l'adresse de l'API est une **variable d'environnement** (`API_URL` dans `.env`) et non une valeur écrite en dur : elle change selon l'endroit d'où on l'appelle.
 
@@ -84,7 +84,7 @@ Un conteneur peut être **démarré** (le processus tourne) sans être **prêt**
 
 ```yaml
 healthcheck:
-  test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+  test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8008/health', timeout=3)"]
   interval: 15s        # vérifier toutes les 15 s
   timeout: 5s          # échec si pas de réponse en 5 s
   retries: 5           # unhealthy après 5 échecs consécutifs
@@ -121,7 +121,7 @@ docker compose down              # arrêter et supprimer les conteneurs (les vol
 | `api` passe *unhealthy* au premier lancement | Téléchargement du modèle plus long que la tolérance : patienter, augmenter `start_period` |
 | `env file .env not found` | Oubli de `cp .env.example .env` |
 | Les modifications du code n'apparaissent pas | `docker compose up` sans `--build` |
-| `port is already allocated` | L'API de B1 tourne encore sur le port 8000 : l'arrêter |
+| `port is already allocated` | L'API de B1 tourne encore sur le port 8008 : l'arrêter |
 | Le dossier `logs/` ou `models/` appartient à root (Linux) | Créé par Docker : `sudo chown -R $USER logs models` |
 | `yaml: line X: did not find expected key` | Indentation incorrecte : YAML utilise des espaces, jamais de tabulations |
 

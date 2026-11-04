@@ -37,7 +37,7 @@ docker compose up --build
 
 ⏳ Le premier lancement télécharge le modèle (≈ 270 Mo) : compte quelques minutes. Les lancements suivants sont rapides, et tout fonctionne hors ligne.
 
-- API : http://localhost:8000/health et http://localhost:8000/docs
+- API : http://localhost:8008/health et http://localhost:8008/docs
 - Interface : http://localhost:8501
 - État des services : `docker compose ps` (l'API doit être *healthy*)
 - Tests : `docker compose exec api pytest -v`

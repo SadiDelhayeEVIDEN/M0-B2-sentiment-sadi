@@ -5,7 +5,7 @@ import os
 import streamlit as st
 
 # Dans docker compose, l'API est joignable par le NOM de son service (cf. .env)
-API_URL = os.getenv("API_URL", "http://localhost:8000")
+API_URL = os.getenv("API_URL", "http://localhost:8008")
 
 st.set_page_config(page_title="Escale Atlantique — Avis clients", page_icon="🏨")
 st.title("🏨 Sentiment des avis clients")

@@ -9,12 +9,12 @@ services:
       - ./models:/models
       - ./logs:/app/logs
     ports:
-      - "8000:8000"
+      - "8008:8008"
     networks:
       - fastia
     healthcheck:
       # Pas de curl dans l'image slim : on interroge /health avec Python
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8008/health', timeout=3)"]
       interval: 15s
       timeout: 5s
       retries: 5

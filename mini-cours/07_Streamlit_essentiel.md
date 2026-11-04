@@ -76,7 +76,7 @@ st.set_page_config(page_title="Escale Atlantique — Avis", page_icon="🏨")
 ```python
 import httpx
 
-response = httpx.post("http://api:8000/predict", json={"text": "Super séjour"}, timeout=10)
+response = httpx.post("http://api:8008/predict", json={"text": "Super séjour"}, timeout=10)
 response.status_code     # 200, 422, 500…
 response.json()          # le corps de la réponse, en dict Python
 ```
@@ -113,7 +113,7 @@ Les pannes réseau **lèvent** une exception, les codes HTTP **non** : un 422 ou
 
 | Symptôme | Cause probable |
 |---|---|
-| `ConnectError` alors que l'API tourne | `localhost` utilisé depuis le conteneur : il faut `http://api:8000` (cf. `06_DockerCompose_essentiel.md`) |
+| `ConnectError` alors que l'API tourne | `localhost` utilisé depuis le conteneur : il faut `http://api:8008` (cf. `06_DockerCompose_essentiel.md`) |
 | La page reste figée sans fin | Pas de `timeout` dans l'appel httpx |
 | Une trace Python rouge s'affiche dans la page | Exception non gérée, ou `response.json()` appelé sur une réponse d'erreur |
 | `JSONDecodeError` | Réponse non JSON (page d'erreur) : vérifier le code HTTP d'abord |
