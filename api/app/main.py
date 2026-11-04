@@ -2,6 +2,7 @@
 
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from loguru import logger
@@ -10,6 +11,30 @@ from app.inference import load_pipeline, predict_sentiment
 from app.schemas import ReviewIn, SentimentOut
 
 MODEL_NAME = os.getenv("MODEL_NAME", "cmarkea/distilcamembert-base-sentiment")
+
+# Dossier des logs : /app/logs dans le conteneur, monté en volume ./logs par docker compose
+LOG_DIR = Path(os.getenv("LOG_DIR", "logs"))
+# Un avis peut contenir un nom, un numéro de chambre, une adresse e-mail… : on ne logge
+# que le début du texte, pour limiter les données personnelles conservées dans les logs.
+LONGUEUR_LOG_TEXTE = 80
+
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+logger.add(
+    LOG_DIR / "api.log",
+    level="INFO",
+    rotation="10 MB",
+    retention="30 days",
+    encoding="utf-8",
+    format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level:<8} | {message}",
+)
+
+
+def tronquer(texte: str, longueur: int = LONGUEUR_LOG_TEXTE) -> str:
+    """Ramène le texte sur une ligne et le coupe à `longueur` caractères (avec une ellipse)."""
+    texte = " ".join(texte.split())
+    if len(texte) <= longueur:
+        return texte
+    return texte[: longueur - 1] + "…"
 
 # Objets partagés par toutes les requêtes (ici : le pipeline de classification)
 state: dict = {}
@@ -56,5 +81,12 @@ def predict(review: ReviewIn) -> SentimentOut:
         raise HTTPException(status_code=503, detail="Modèle non chargé")
 
     resultat = predict_sentiment(state["classifier"], review.text)
-    logger.info("sentiment={} latence={}ms", resultat["sentiment"], resultat["latence_ms"])
+    # Une ligne par appel : texte tronqué, sentiment prédit et durée
+    logger.info(
+        'predict | texte="{}" | longueur={} | sentiment={} | latence_ms={}',
+        tronquer(review.text),
+        len(review.text),
+        resultat["sentiment"],
+        resultat["latence_ms"],
+    )
     return SentimentOut(**resultat)

@@ -8,6 +8,8 @@ services:
     volumes:
       - ./models:/models
       - ./logs:/app/logs
+      # Avis annotés : pour les tests (docker compose exec api pytest -v)
+      - ./data:/app/data:ro
     ports:
       - "8008:8008"
     networks:
