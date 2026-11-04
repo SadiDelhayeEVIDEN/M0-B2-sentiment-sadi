@@ -33,11 +33,15 @@ if st.button("Analyser", type="primary"):
                 result = response.json()
                 emoji, couleur = sentiments.get(result["sentiment"], ("❓", "gray"))
                 st.badge(f"Sentiment : {result['sentiment']}", icon=emoji, color=couleur)
-                st.write(f"Score : {result['score']:.2f}")
+                # L'API renvoie les scores des 5 étoiles ; on affiche l'étoile la plus probable
+                scores = result["scores_etoiles"]
+                etoile = max(scores, key=scores.get)
+                st.write(f"Note la plus probable : {etoile} ({scores[etoile]:.0%})")
+                st.caption(f"Latence : {result['latence_ms']} ms")
             elif response.status_code == 422:
                 st.error("Le texte fourni est vide ou invalide.")
             elif response.status_code == 500:
-                st.error("Erreur interne du serveur. Veuillez réessayer plus tard.")                
+                st.error("Erreur interne du serveur. Veuillez réessayer plus tard.")
             else:
                 st.error("Erreur lors de l'analyse du sentiment.")
         except httpx.HTTPError as e:
